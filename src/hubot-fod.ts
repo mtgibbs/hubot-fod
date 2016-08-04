@@ -18,4 +18,22 @@ module.exports = (robot: any) => {
             msg.reply(message);
         });
     });
+
+    robot.respond(/show me the releases for app id (.\d+)/i, (res: any) => {
+
+        let appId = parseInt(res.match[1]);
+
+        if (appId > 0) {
+            let api = new FoDApi();
+            api.getReleases(appId, (err, message) => {
+                if (err) {
+                    robot.logger.error(err);
+                    res.reply(err);
+                    return;
+                }
+
+                res.reply(`Here are the releases for App Id ${appId}: \n ${message}`);
+            });
+        }
+    });
 }
