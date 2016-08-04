@@ -1,6 +1,6 @@
 {
   "name": "hubot-fod",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Hubot Script for communicating with HPE Fortify on Demand.",
   "main": "./dist/index.js",
   "scripts": {
@@ -9,17 +9,24 @@
     "tsc:w": "tsc -w",
     "start": "tsc && concurrently \"npm run tsc:w\""
   },
+  "author": "Matt Gibbs <matt.gibbs@hpe.com> (http://mtgibbs.xyz)",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mtgibbs/hubot-fod.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mtgibbs/hubot-fod/issues"
+  },
   "keywords": [
     "hubot",
     "hubot-script",
     "fortify",
     "fod"
   ],
-  "author": "matt.gibbs@hpe.com",
-  "license": "ISC",
+  "readme": "README.md",
   "devDependencies": {
     "concurrently": "2.2.0",
-    "tslint": "^3.14.0",
+    "tslint": "3.14.0",
     "typescript": "1.8.10",
     "typings": "1.3.2"
   },
