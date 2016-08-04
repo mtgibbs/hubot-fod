@@ -88,4 +88,40 @@ export class FoDApi {
             });
         });
     }
+
+    public getReleases(appId: number, callback: (err: any, message?: string) => void) {
+        this.getAccessToken((err, token) => {
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            let requestOptions = {
+                uri: `https://api.hpfod.com/api/v3/applications/${appId}/releases`,
+                method: 'GET',
+                headers: {
+                    'authorization': ['Bearer', token].join(' '),
+                    'content-type': 'application/octet-stream'
+                }
+            };
+
+            request(requestOptions, (err, response, body) => {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+
+                let bodyJSON = JSON.parse(body);
+
+                if (bodyJSON && bodyJSON.totalCount > 0) {
+                    let x = bodyJSON.items.map((item: any) => {
+                        return `${item.releaseId}) ${item.releaseName} [${item.isPassed ? 'PASSING' : 'FAILING'}]`;
+                    });
+                    callback(null, `\n${x.join('\n')}`);
+                } else {
+                    callback(null, 'I couldn\'t find anything.  Did you try to see something you shouldn\'t have?');
+                }
+            });
+        });
+    }
 }
