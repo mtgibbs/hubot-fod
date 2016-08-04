@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "outDir": "dist",
+        "declaration": false
+    },
+    "files": [
+        "index.ts",
+        "./src/fod-api.ts",
+        "./src/hubot-fod.ts"
+    ]
+}

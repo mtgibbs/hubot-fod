@@ -83,3 +83,10 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+typings/
+*.js
+*.js.map
+
+.hubot_history
+dist

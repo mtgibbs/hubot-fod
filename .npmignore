@@ -1,0 +1,17 @@
+typings
+src
+node_modules
+
+.gitattributes
+.npmignore
+
+*.ts
+*.js.map
+
+typings.json
+tsconfig.json
+
+.vscode
+
+!dist/**/*.*
+dist/**/*.js.map
