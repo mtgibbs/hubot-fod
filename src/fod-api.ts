@@ -27,7 +27,7 @@ export class FoDApi {
             }
         };
 
-        request(requestOptions, function (err, response, body) {
+        request(requestOptions, (err, response, body) => {
             if (err) {
                 cb(err);
                 return;
@@ -69,7 +69,7 @@ export class FoDApi {
                 }
             };
 
-            request(requestOptions, function (err, response, body) {
+            request(requestOptions, (err, response, body) => {
                 if (err) {
                     callback(err);
                 }
