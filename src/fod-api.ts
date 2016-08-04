@@ -78,10 +78,10 @@ export class FoDApi {
 
                 if (bodyJSON.totalCount > 0) {
                     let x = bodyJSON.items.map((item: any) => {
-                        return item.applicationName;
+                        return `${item.applicationId}) ${item.applicationName}`;
                     });
 
-                    callback(null, x.join('\n'));
+                    callback(null, `\n${x.join('\n')}`);
                 } else {
                     callback(null, 'Sorry, I couldn\'t find anything');
                 }
