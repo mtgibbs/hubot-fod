@@ -47,7 +47,9 @@ export HUBOT_FOD_BASEURI="hpfod.com"
 
 ## Developer Setup
 
-After cloning the repository:
+### Working on Hubot-FoD
+
+From the project directory, run:
 
 ```
 npm install
@@ -57,7 +59,7 @@ npm start
 
 This will install all of the necessary packages, get your typings installed, and start the typescript compiler watching for changes.
 
-If you do not want to run the compiler concurrently, you can simply use:
+If you do not want to run the compiler concurrently, run:
 
 ```
 npm run tsc
@@ -68,3 +70,15 @@ Should your changes change the file structure and you want to start clean, run:
 ```
 npm run clean
 ```
+
+### Installing to a running Hubot Instance
+
+If you are testing your changes with a live hubot, you can install this script from your local workspace.
+
+Make sure to have compiled Hubot-FoD, and then from your Hubot directory:
+
+```
+npm install /path/to/hubot-fod
+```
+
+Then you can restart Hubot and he should be running your local version.  Simply run the install again when you want to test your changes.
