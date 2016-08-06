@@ -10,7 +10,7 @@ import {FoDApi} from './fod-api';
 
 module.exports = (robot: any) => {
 
-    robot.respond(/(show|list) (apps|applications)/i, (msg: any) => {
+    robot.respond(/(show |list )?(apps|applications)/i, (msg: any) => {
         let api = new FoDApi(process.env.HUBOT_FOD_BASEURI);
 
         api.getApplications((err: any, message: string) => {
@@ -23,9 +23,9 @@ module.exports = (robot: any) => {
         });
     });
 
-    robot.respond(/(show|list) releases (.\d+)/i, (res: any) => {
+    robot.respond(/(show |list )?releases( for)? app (.\d+)/i, (res: any) => {
 
-        let appId = parseInt(res.match[2]);
+        let appId = parseInt(res.match[3]);
 
         if (appId > 0) {
             let api = new FoDApi(process.env.HUBOT_FOD_BASEURI);
@@ -40,8 +40,8 @@ module.exports = (robot: any) => {
         }
     });
 
-    robot.respond(/(show|list) scans for app (.\d+)/i, (res: any) => {
-        let appId = parseInt(res.match[2]);
+    robot.respond(/(show |list )?scans( for)? app (.\d+)/i, (res: any) => {
+        let appId = parseInt(res.match[3]);
 
         if (appId > 0) {
             let api = new FoDApi(process.env.HUBOT_FOD_BASEURI);
@@ -56,7 +56,7 @@ module.exports = (robot: any) => {
         }
     });
 
-    robot.respond(/(show|list) reports( for)? app (.\d+)/i, (res: any) => {
+    robot.respond(/(show |list )?reports( for)? app (.\d+)/i, (res: any) => {
         let appId = parseInt(res.match[3]);
 
         if (appId > 0) {
