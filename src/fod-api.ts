@@ -48,7 +48,7 @@ export class FoDApi {
                     if (responseObject.access_token) {
                         return callback(null, responseObject.access_token)
                     }
-                    
+
                     return callback('Error authenticating with Fortify on Demand - Authentication Failed');
 
                 default:
@@ -85,7 +85,7 @@ export class FoDApi {
                     });
 
                     return callback(null, `\n${items.join('\n')}`);
-                } 
+                }
 
                 return callback(null, `Sorry, I couldn't find anything`);
             });
