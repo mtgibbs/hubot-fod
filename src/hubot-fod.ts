@@ -5,7 +5,7 @@ import request = require('request');
 
 module.exports = (robot: any) => {
 
-    robot.respond(/show me my apps/i, (msg: any) => {
+    robot.respond(/show|list apps|applications/i, (msg: any) => {
         let api = new FoDApi();
 
         api.getApplications((err: any, message: string) => {
@@ -19,7 +19,7 @@ module.exports = (robot: any) => {
         });
     });
 
-    robot.respond(/show me the releases for app id (.\d+)/i, (res: any) => {
+    robot.respond(/show|list releases (.\d+)/i, (res: any) => {
 
         let appId = parseInt(res.match[1]);
 
