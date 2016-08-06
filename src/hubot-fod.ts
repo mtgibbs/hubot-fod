@@ -47,7 +47,7 @@ module.exports = (robot: any) => {
                     return res.reply(err);
                 }
 
-                res.reply(message);
+                res.reply(`\n${message}`);
             });
         }
     });
