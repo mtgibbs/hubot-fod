@@ -18,7 +18,7 @@ export class FoDApi {
 
     public getAccessToken(cb: (err: any, token?: string) => void): void {
 
-        let uri = `${this.getApiUri}/oauth/token`;
+        let uri = `${this.getApiUri()}/oauth/token`;
 
         let postData = {
             'scope': 'https://hpfod.com/tenant',
