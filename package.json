@@ -4,7 +4,6 @@
   "description": "Hubot Script for communicating with HPE Fortify on Demand.",
   "main": "./dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "typings": "typings install",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
