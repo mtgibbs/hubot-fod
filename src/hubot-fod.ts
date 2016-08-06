@@ -1,7 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
 
 import {FoDApi} from './fod-api';
-import request = require('request');
 
 module.exports = (robot: any) => {
 
