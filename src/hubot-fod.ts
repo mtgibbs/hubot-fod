@@ -1,3 +1,10 @@
+// Description
+//   Script for interacting with the Fortify on Demand platform
+//
+// Configuration:
+//   HUBOT_FOD_APIKEY (FoD API Key)
+//   HUBOT_FOD_APISECRET (FoD API Secret)
+//   HUBOT_FOD_BASEURI (optional, only necessary if your account is not located in the US.)
 /// <reference path="../typings/index.d.ts" />
 
 import {FoDApi} from './fod-api';
