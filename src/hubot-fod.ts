@@ -35,4 +35,20 @@ module.exports = (robot: any) => {
             });
         }
     });
+
+    robot.respond(/(show|list) scans for app (.\d+)/i, (res: any) => {
+        let appId = parseInt(res.match[2]);
+
+        if (appId > 0) {
+            let api = new FoDApi(process.env.HUBOT_FOD_BASEURI);
+            api.getScansForApp(appId, (err, message) => {
+                if (err) {
+                    robot.logger.error(err);
+                    return res.reply(err);
+                }
+
+                res.reply(`\n${message}`);
+            });
+        }
+    });
 }

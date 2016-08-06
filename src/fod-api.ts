@@ -7,16 +7,16 @@ export class FoDApi {
     private _protocol: string = 'https'; // this could be configurable later if the bot developer was testing locally
     private _baseUri: string = 'hpfod.com';
 
-    constructor(baseUri?: string) { 
+    constructor(baseUri?: string) {
         if (baseUri)
             this._baseUri = baseUri;
     }
 
-    private getApiUri():string {
+    private getApiUri(): string {
         return `${this._protocol}://api.${this._baseUri}`;
     }
 
-    private getSiteUri():string {
+    private getSiteUri(): string {
         return `${this._protocol}://${this._baseUri}`;
     }
 
@@ -134,6 +134,57 @@ export class FoDApi {
                     callback(null, `\n${x.join('\n')}`);
                 } else {
                     callback(null, 'I couldn\'t find anything.  Did you try to see something you shouldn\'t have?');
+                }
+            });
+        });
+    }
+
+    public getScansForApp(appId: number, callback: (err: any, message?: string) => void) {
+        this.getAccessToken((err, token) => {
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            let requestOptions = {
+                uri: `${this.getApiUri()}/api/v3/applications/${appId}/scans?limit=3`,
+                method: 'GET',
+                headers: {
+                    'authorization': ['Bearer', token].join(' '),
+                    'content-type': 'application/octet-stream'
+                }
+            };
+
+            request(requestOptions, (err, res, body) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                switch (res.statusCode) {
+                    case 200:
+
+                        let result = JSON.parse(body);
+
+                        if (!result) {
+                            return callback(null, `Sorry.  I couldn't find anything.`);
+                        }
+
+                        if (result.totalCount < 1) {
+                            return callback(null, `No scans found for app id ${appId}.`);
+                        }
+
+                        let items = result.items.map((item: any) => {
+                            return `${item.scanType} Scan  --  Completed On: ${item.completedDateTime} -- ${item.totalIssues} Issues \
+                                        \n${this.getSiteUri()}/redirect/releases/${item.releaseId}`;
+                        });
+
+                        return callback(null, items.join('\n\n'));
+
+                    case 404:
+                        return callback(null, `Sorry.  I couldn't find anything.`);
+
+                    default:
+                        return callback(`API returned status code: ${res.statusCode}`);
                 }
             });
         });
