@@ -114,7 +114,8 @@ export class FoDApi {
 
                 if (bodyJSON && bodyJSON.totalCount > 0) {
                     let x = bodyJSON.items.map((item: any) => {
-                        return `${item.releaseId}) ${item.releaseName} [${item.isPassed ? 'PASSING' : 'FAILING'}]`;
+                        return `[${item.releaseId}] [${item.isPassed ? 'PASSING' : 'FAILING'}] -- ${item.releaseName} -- Latest Scan Status: ${item.currentAnalysisStatusType} \
+                                \n${this.getSiteUri()}/redirect/releases/${item.releaseId}`;
                     });
                     return callback(null, `\n${x.join('\n')}`);
                 }
