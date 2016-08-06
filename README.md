@@ -1,6 +1,9 @@
 # hubot-fod
 Hubot Script for interacting with Fortify on Demand (Prototype)
 
+[![NPM Version](https://img.shields.io/npm/v/hubot-fod.svg)](https://www.npmjs.com/package/hubot-fod)
+[![Build Status](https://travis-ci.org/mtgibbs/hubot-fod.svg?branch=master)](https://travis-ci.org/mtgibbs/hubot-fod)
+
 ## Installation
 
 Add **hubot-fod** to your hubot packages
