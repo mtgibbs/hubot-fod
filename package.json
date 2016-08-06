@@ -5,9 +5,11 @@
   "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "typings": "typings install",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "start": "tsc && concurrently \"npm run tsc:w\""
+    "start": "tsc && concurrently \"npm run tsc:w\"",
+    "clean": "rimraf dist"
   },
   "author": "Matt Gibbs <matt.gibbs@hpe.com> (http://mtgibbs.xyz)",
   "repository": {
@@ -26,6 +28,7 @@
   "readme": "README.md",
   "devDependencies": {
     "concurrently": "2.2.0",
+    "rimraf": "2.5.4",
     "tslint": "3.14.0",
     "typescript": "1.8.10",
     "typings": "1.3.2"
