@@ -9,7 +9,8 @@
     "tsc": "tsc",
     "tsc:w": "tsc -w",
     "start": "tsc && concurrently \"npm run tsc:w\"",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "lint": "tslint -c ./tslint.json ./**/*.ts"
   },
   "author": "Matt Gibbs <matt.gibbs@hpe.com> (http://mtgibbs.xyz)",
   "repository": {
