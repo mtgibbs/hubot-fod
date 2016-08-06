@@ -44,3 +44,27 @@ Please be careful with these values in the case where you are automating your bo
 ```
 export HUBOT_FOD_BASEURI="hpfod.com"
 ```
+
+## Developer Setup
+
+After cloning the repository:
+
+```
+npm install
+npm run typings
+npm start
+```
+
+This will install all of the necessary packages, get your typings installed, and start the typescript compiler watching for changes.
+
+If you do not want to run the compiler concurrently, you can simply use:
+
+```
+npm run tsc
+```
+
+Should your changes change the file structure and you want to start clean, run:
+
+```
+npm run clean
+```
