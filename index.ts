@@ -1,7 +1,7 @@
 /// <reference path="typings/index.d.ts" />
 
-import fs = require('fs');
-import path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
 module.exports = (robot: any, scripts: any) => {
 
