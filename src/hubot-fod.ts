@@ -55,4 +55,20 @@ module.exports = (robot: any) => {
             });
         }
     });
+
+    robot.respond(/(show|list) reports( for)? app (.\d+)/i, (res: any) => {
+        let appId = parseInt(res.match[3]);
+
+        if (appId > 0) {
+            let api = new FoDApi(process.env.HUBOT_FOD_BASEURI);
+            api.getReportsForApp(appId, (err, message) => {
+                if (err) {
+                    robot.logger.error(err);
+                    return res.reply(err);
+                }
+
+                return res.reply(`Here are the last 3 Reports for AppId: ${appId}\n${message}`);
+            });
+        }
+    });
 };

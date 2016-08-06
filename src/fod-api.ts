@@ -20,6 +20,17 @@ export class FoDApi {
         return `${this._protocol}://${this._baseUri}`;
     }
 
+    private buildGetRequest(token: string, uri: string): request.UriOptions & request.CoreOptions {
+        return {
+            uri: uri,
+            method: 'GET',
+            headers: {
+                'authorization': ['Bearer', token].join(' '),
+                'content-type': 'application/octet-stream'
+            }
+        };
+    }
+
     public getAccessToken(callback: (err: any, token?: string) => void): void {
 
         let postData = {
@@ -63,14 +74,7 @@ export class FoDApi {
             if (err)
                 return callback(err);
 
-            let requestOptions = {
-                uri: `${this.getApiUri()}/api/v3/applications`,
-                method: 'GET',
-                headers: {
-                    'authorization': ['Bearer', token].join(' '),
-                    'content-type': 'application/octet-stream'
-                }
-            };
+            let requestOptions = this.buildGetRequest(token, `${this.getApiUri()}/api/v3/applications`);
 
             request(requestOptions, (err, response, body) => {
                 if (err)
@@ -97,14 +101,7 @@ export class FoDApi {
             if (err)
                 return callback(err);
 
-            let requestOptions = {
-                uri: `${this.getApiUri()}/api/v3/applications/${appId}/releases`,
-                method: 'GET',
-                headers: {
-                    'authorization': ['Bearer', token].join(' '),
-                    'content-type': 'application/octet-stream'
-                }
-            };
+            let requestOptions = this.buildGetRequest(token, `${this.getApiUri()}/api/v3/applications/${appId}/releases`);
 
             request(requestOptions, (err, response, body) => {
                 if (err)
@@ -130,14 +127,8 @@ export class FoDApi {
             if (err)
                 return callback(err);
 
-            let requestOptions = {
-                uri: `${this.getApiUri()}/api/v3/applications/${appId}/scans?limit=3`,
-                method: 'GET',
-                headers: {
-                    'authorization': ['Bearer', token].join(' '),
-                    'content-type': 'application/octet-stream'
-                }
-            };
+
+            let requestOptions = this.buildGetRequest(token, `${this.getApiUri()}/api/v3/applications/${appId}/scans?limit=3`);
 
             request(requestOptions, (err, res, body) => {
                 if (err)
@@ -165,6 +156,57 @@ export class FoDApi {
 
                     case 404:
                         return callback(null, `Sorry.  I couldn't find anything.`);
+
+                    default:
+                        return callback(`API returned status code: ${res.statusCode}`);
+                }
+            });
+        });
+    }
+
+    public getReportsForApp(appId: number, callback: (err: any, message?: string) => void) {
+        this.getAccessToken((err, token) => {
+            if (err)
+                return callback(err);
+
+            let requestOptions = this.buildGetRequest(token, `${this.getApiUri()}/api/v3/reports?filters=applicationId%3A${appId}%2BreportStatusTypeId%3A2&fields=none`);
+
+            request(requestOptions, (err, res, body) => {
+                if (err)
+                    return callback(err);
+
+                switch (res.statusCode) {
+                    case 200:
+
+                        let countResult = JSON.parse(body);
+
+                        if (countResult && countResult.totalCount) {
+                            const limit = 3;
+                            requestOptions = this.buildGetRequest(token, `${this.getApiUri()}/api/v3/reports?applicationId%3A${appId}}%2BreportStatusTypeId%3A2&orderBy=reportId&offset=${countResult.totalCount - limit}&limit=${limit}`);
+                            return request(requestOptions, (err, res, body) => {
+                                if (err)
+                                    return callback(err);
+
+                                switch (res.statusCode) {
+                                    case 200:
+
+                                        let result = JSON.parse(body);
+
+                                        if (result && result.items) {
+                                            let items = result.items.map((item: any) => {
+                                                return `${item.reportName} -- ${item.reportType}\
+                                                        \n${this.getSiteUri()}/reports/downloadreport?reportId=${item.reportId}`;
+                                            }).reverse();
+
+                                            return callback(null, items.join('\n'));
+                                        }
+                                    default:
+                                        return callback(`API returned status code: ${res.statusCode}`);
+                                }
+                            });
+                        }
+
+                        return callback(null, 'No reports for that application.');
 
                     default:
                         return callback(`API returned status code: ${res.statusCode}`);
