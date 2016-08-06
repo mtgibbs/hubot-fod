@@ -6,7 +6,7 @@ import request = require('request');
 module.exports = (robot: any) => {
 
     robot.respond(/(show|list) (apps|applications)/i, (msg: any) => {
-        let api = new FoDApi();
+        let api = new FoDApi(process.env.HUBOT_FOD_BASEURI);
 
         api.getApplications((err: any, message: string) => {
             if (err) {
@@ -24,7 +24,7 @@ module.exports = (robot: any) => {
         let appId = parseInt(res.match[2]);
 
         if (appId > 0) {
-            let api = new FoDApi();
+            let api = new FoDApi(process.env.HUBOT_FOD_BASEURI);
             api.getReleases(appId, (err, message) => {
                 if (err) {
                     robot.logger.error(err);
