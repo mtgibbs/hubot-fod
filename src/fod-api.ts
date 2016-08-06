@@ -193,7 +193,7 @@ export class FoDApi {
                                         let result = JSON.parse(body);
 
                                         if (result && result.items) {
-                                            var items = result.items.map((item: any) => {
+                                            let items = result.items.map((item: any) => {
                                                 return `${item.reportName} -- ${item.reportType}\
                                                         \n${this.getSiteUri()}/reports/downloadreport?reportId=${item.reportId}`;
                                             }).reverse();
