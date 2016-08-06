@@ -20,9 +20,7 @@ export class FoDApi {
         return `${this._protocol}://${this._baseUri}`;
     }
 
-    public getAccessToken(cb: (err: any, token?: string) => void): void {
-
-        let uri = `${this.getApiUri()}/oauth/token`;
+    public getAccessToken(callback: (err: any, token?: string) => void): void {
 
         let postData = {
             'scope': 'https://hpfod.com/tenant',
@@ -32,36 +30,29 @@ export class FoDApi {
         };
 
         let requestOptions = {
-            uri: uri,
+            uri: `${this.getApiUri()}/oauth/token`,
             method: 'POST',
             form: postData,
             proxy: '',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         };
 
         request(requestOptions, (err, response, body) => {
-            if (err) {
-                cb(err);
-                return;
-            }
+            if (err)
+                return callback(err);
 
             switch (response.statusCode) {
                 case 200:
-                    var responseObject = JSON.parse(body);
+                    let responseObject = JSON.parse(body);
 
                     if (responseObject.access_token) {
-                        cb(null, responseObject.access_token)
+                        return callback(null, responseObject.access_token)
                     }
-                    else {
-                        cb('Error authenticating with Fortify on Demand - Authentication Failed');
-                    }
+                    
+                    return callback('Error authenticating with Fortify on Demand - Authentication Failed');
 
-                    break;
                 default:
-                    cb('Error authenticating with Fortify on Demand - InternalServerError');
-                    break;
+                    return callback('Error authenticating with Fortify on Demand - InternalServerError');
             }
         });
     }
@@ -69,10 +60,8 @@ export class FoDApi {
     public getApplications(callback: (err: any, message?: string) => void) {
         this.getAccessToken((err, token) => {
 
-            if (err) {
-                callback(err);
-                return;
-            }
+            if (err)
+                return callback(err);
 
             let requestOptions = {
                 uri: `${this.getApiUri()}/api/v3/applications`,
@@ -84,31 +73,28 @@ export class FoDApi {
             };
 
             request(requestOptions, (err, response, body) => {
-                if (err) {
-                    callback(err);
-                }
+                if (err)
+                    return callback(err);
 
                 let bodyJSON = JSON.parse(body);
 
                 if (bodyJSON.totalCount > 0) {
-                    let x = bodyJSON.items.map((item: any) => {
+                    let items = bodyJSON.items.map((item: any) => {
                         return `${item.applicationId}) ${item.applicationName}`;
                     });
 
-                    callback(null, `\n${x.join('\n')}`);
-                } else {
-                    callback(null, 'Sorry, I couldn\'t find anything');
-                }
+                    return callback(null, `\n${items.join('\n')}`);
+                } 
+
+                return callback(null, `Sorry, I couldn't find anything`);
             });
         });
     }
 
     public getReleases(appId: number, callback: (err: any, message?: string) => void) {
         this.getAccessToken((err, token) => {
-            if (err) {
-                callback(err);
-                return;
-            }
+            if (err)
+                return callback(err);
 
             let requestOptions = {
                 uri: `${this.getApiUri()}/api/v3/applications/${appId}/releases`,
@@ -120,10 +106,8 @@ export class FoDApi {
             };
 
             request(requestOptions, (err, response, body) => {
-                if (err) {
-                    callback(err);
-                    return;
-                }
+                if (err)
+                    return callback(err);
 
                 let bodyJSON = JSON.parse(body);
 
@@ -131,20 +115,18 @@ export class FoDApi {
                     let x = bodyJSON.items.map((item: any) => {
                         return `${item.releaseId}) ${item.releaseName} [${item.isPassed ? 'PASSING' : 'FAILING'}]`;
                     });
-                    callback(null, `\n${x.join('\n')}`);
-                } else {
-                    callback(null, 'I couldn\'t find anything.  Did you try to see something you shouldn\'t have?');
+                    return callback(null, `\n${x.join('\n')}`);
                 }
+
+                return callback(null, 'I couldn\'t find anything.  Did you try to see something you shouldn\'t have?');
             });
         });
     }
 
     public getScansForApp(appId: number, callback: (err: any, message?: string) => void) {
         this.getAccessToken((err, token) => {
-            if (err) {
-                callback(err);
-                return;
-            }
+            if (err)
+                return callback(err);
 
             let requestOptions = {
                 uri: `${this.getApiUri()}/api/v3/applications/${appId}/scans?limit=3`,
@@ -156,9 +138,8 @@ export class FoDApi {
             };
 
             request(requestOptions, (err, res, body) => {
-                if (err) {
+                if (err)
                     return callback(err);
-                }
 
                 switch (res.statusCode) {
                     case 200:
