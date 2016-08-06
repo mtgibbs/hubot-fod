@@ -1,6 +1,6 @@
 /// <reference path="../typings/index.d.ts" />
 
-import request = require('request');
+import * as request from 'request';
 
 export class FoDApi {
 
