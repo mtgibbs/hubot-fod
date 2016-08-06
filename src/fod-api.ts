@@ -173,21 +173,19 @@ export class FoDApi {
                             return callback(null, `No scans found for app id ${appId}.`);
                         }
 
-                        let message = result.items.map((item: any) => {
-                            return `${item.scanType} Scan  --  Completed On: ${item.completedDateTime} -- ${item.totalIssues} Issues\n
-                                        ${this.getSiteUri()}/redirect/releases/${item.releaseId}`;
+                        let items = result.items.map((item: any) => {
+                            return `${item.scanType} Scan  --  Completed On: ${item.completedDateTime} -- ${item.totalIssues} Issues \
+                                        \n${this.getSiteUri()}/redirect/releases/${item.releaseId}`;
                         });
 
-                        return callback(null, message);
+                        return callback(null, items.join('\n\n'));
 
                     case 404:
                         return callback(null, `Sorry.  I couldn't find anything.`);
 
                     default:
                         return callback(`API returned status code: ${res.statusCode}`);
-
                 }
-
             });
         });
     }
