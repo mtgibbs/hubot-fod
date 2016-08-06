@@ -15,3 +15,5 @@ tsconfig.json
 
 !dist/**/*.*
 dist/**/*.js.map
+
+.travis.yml
