@@ -80,7 +80,8 @@ export class FoDApi {
 
                 if (bodyJSON.totalCount > 0) {
                     let items = bodyJSON.items.map((item: any) => {
-                        return `${item.applicationId}) ${item.applicationName}`;
+                        return `[${item.applicationId}] -- ${item.applicationName} \
+                                \n${this.getSiteUri()}/redirect/applications/${item.applicationId}`;
                     });
 
                     return callback(null, `\n${items.join('\n')}`);
