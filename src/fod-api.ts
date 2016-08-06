@@ -46,7 +46,7 @@ export class FoDApi {
                     let responseObject = JSON.parse(body);
 
                     if (responseObject.access_token) {
-                        return callback(null, responseObject.access_token)
+                        return callback(null, responseObject.access_token);
                     }
 
                     return callback('Error authenticating with Fortify on Demand - Authentication Failed');
