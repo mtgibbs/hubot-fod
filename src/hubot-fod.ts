@@ -17,11 +17,10 @@ module.exports = (robot: any) => {
         api.getApplications((err: any, message: string) => {
             if (err) {
                 robot.logger.error(err);
-                msg.reply(err);
-                return;
+                return msg.reply(err);
             }
 
-            msg.reply(message);
+            return msg.reply(message);
         });
     });
 
@@ -34,11 +33,10 @@ module.exports = (robot: any) => {
             api.getReleases(appId, (err, message) => {
                 if (err) {
                     robot.logger.error(err);
-                    res.reply(err);
-                    return;
+                    return res.reply(err);
                 }
 
-                res.reply(`Here are the releases for App Id ${appId}: \n ${message}`);
+                return res.reply(`Here are the releases for App Id ${appId}: \n ${message}`);
             });
         }
     });
@@ -54,7 +52,7 @@ module.exports = (robot: any) => {
                     return res.reply(err);
                 }
 
-                res.reply(`\n${message}`);
+                return res.reply(`\n${message}`);
             });
         }
     });
