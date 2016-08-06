@@ -4,11 +4,21 @@ import request = require('request');
 
 export class FoDApi {
 
-    constructor() { }
+    private _protocol: string = 'https'; // this could be configurable later if the bot developer was testing locally
+    private _baseUri: string = 'hpfod.com';
+
+    constructor(baseUri?: string) { 
+        if (baseUri)
+            this._baseUri = baseUri;
+    }
+
+    private getApiUri():string {
+        return `${this._protocol}://api.${this._baseUri}`;
+    }
 
     public getAccessToken(cb: (err: any, token?: string) => void): void {
 
-        let uri = 'https://api.hpfod.com/oauth/token';
+        let uri = `${this.getApiUri()}/oauth/token`;
 
         let postData = {
             'scope': 'https://hpfod.com/tenant',
@@ -61,7 +71,7 @@ export class FoDApi {
             }
 
             let requestOptions = {
-                uri: 'https://api.hpfod.com/api/v3/applications',
+                uri: `${this.getApiUri()}/api/v3/applications`,
                 method: 'GET',
                 headers: {
                     'authorization': ['Bearer', token].join(' '),
@@ -97,7 +107,7 @@ export class FoDApi {
             }
 
             let requestOptions = {
-                uri: `https://api.hpfod.com/api/v3/applications/${appId}/releases`,
+                uri: `${this.getApiUri()}/api/v3/applications/${appId}/releases`,
                 method: 'GET',
                 headers: {
                     'authorization': ['Bearer', token].join(' '),

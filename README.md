@@ -37,4 +37,10 @@ export HUBOT_FOD_APISECRET="<YOUR_API_SECRET_GOES_HERE>"
 
 Please be careful with these values in the case where you are automating your bot deployment.  Please generate the bot its own key so that it can easily be revoked should mistakes happen.
 
+### HUBOT_FOD_BASEURI
 
+***OPTIONAL*** This is the URI of the instance of FoD you are interested in interacting with.  Defaults to: **hpfod.com**
+
+```
+export HUBOT_FOD_BASEURI="hpfod.com"
+```
