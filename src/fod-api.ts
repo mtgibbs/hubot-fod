@@ -16,6 +16,10 @@ export class FoDApi {
         return `${this._protocol}://api.${this._baseUri}`;
     }
 
+    private getSiteUri():string {
+        return `${this._protocol}://${this._baseUri}`;
+    }
+
     public getAccessToken(cb: (err: any, token?: string) => void): void {
 
         let uri = `${this.getApiUri()}/oauth/token`;
