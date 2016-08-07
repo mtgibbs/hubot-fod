@@ -109,7 +109,7 @@ module.exports = (robot: any) => {
     });
 
     robot.respond(/(show |list )?scans( for)? app (.\d+)/i, (msg: any) => {
-        
+
         const appId = parseInt(msg.match[3]);
         if (appId) {
             authenticate(msg, (err, token) => {
