@@ -25,7 +25,6 @@
     "fortify",
     "fod"
   ],
-  "readme": "README.md",
   "devDependencies": {
     "concurrently": "2.2.0",
     "rimraf": "2.5.4",
