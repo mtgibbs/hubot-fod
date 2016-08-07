@@ -88,4 +88,4 @@ Then you can restart Hubot and he should be running your local version.  Simply 
 
 ## License
 
-MIT License Copyright (c) 2016 Matt Gibbs
+MIT License - Copyright (c) 2016 Matt Gibbs
