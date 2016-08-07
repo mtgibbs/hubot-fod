@@ -6,7 +6,7 @@
 //   HUBOT_FOD_APISECRET (FoD API Secret)
 //   HUBOT_FOD_BASEURI (optional, only necessary if your account is not located in the US.)
 
-import {FoDApiHelper} from './scripts/fod-api';
+import {FoDApiHelper} from './util/fod-api-helper';
 import * as qs from 'querystring';
 
 function authenticate(msg: any, callback: (err: any, token?: string) => void) {
