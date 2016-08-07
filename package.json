@@ -1,6 +1,6 @@
 {
   "name": "hubot-fod",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Hubot Script for communicating with HPE Fortify on Demand.",
   "main": "./dist/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "clean": "rimraf dist",
     "lint": "tslint -c ./tslint.json ./**/*.ts"
   },
-  "author": "Matt Gibbs <matt.gibbs@hpe.com> (http://mtgibbs.xyz)",
+  "author": "Matt Gibbs <matt@mtgibbs.xyz> (http://mtgibbs.xyz)",
   "repository": {
     "type": "git",
     "url": "git@github.com:mtgibbs/hubot-fod.git"
