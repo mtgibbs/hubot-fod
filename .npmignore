@@ -10,6 +10,7 @@ node_modules
 
 typings.json
 tsconfig.json
+tslint.json
 
 .vscode
 
