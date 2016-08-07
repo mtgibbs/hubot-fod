@@ -2,8 +2,5 @@
   "name": "hubot-fod",
   "globalDependencies": {
     "node": "registry:dt/node#6.0.0+20160802155038"
-  },
-  "dependencies": {
-    "request": "registry:npm/request#2.69.0+20160428223725"
   }
 }

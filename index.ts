@@ -14,7 +14,7 @@ module.exports = (robot: any, scripts: any) => {
             dir.forEach((script) => {
                 if (scripts && scripts.indexOf('*') < 0 && scripts.indexOf(script) >= 0) {
                     robot.loadFile(scriptsPath, script);
-                } else {
+                } else if (script.indexOf('fod-api-helper') < 0) {
                     robot.loadFile(scriptsPath, script);
                 }
             });

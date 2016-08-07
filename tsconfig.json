@@ -11,7 +11,7 @@
     },
     "files": [
         "index.ts",
-        "./src/fod-api.ts",
+        "./src/util/fod-api-helper.ts",
         "./src/hubot-fod.ts"
     ]
 }
