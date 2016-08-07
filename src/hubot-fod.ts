@@ -6,7 +6,7 @@
 //   HUBOT_FOD_APISECRET (FoD API Secret)
 //   HUBOT_FOD_BASEURI (optional, only necessary if your account is not located in the US.)
 
-import {FoDApiHelper} from './fod-api';
+import {FoDApiHelper} from './scripts/fod-api';
 import * as qs from 'querystring';
 
 function authenticate(msg: any, callback: (err: any, token?: string) => void) {
@@ -74,16 +74,15 @@ module.exports = (robot: any) => {
         });
     });
 
-    robot.respond(/(show |list )?releases( for)? app (.\d+)/i, (res: any) => {
+    robot.respond(/(show |list )?releases( for)? app (.\d+)/i, (msg: any) => {
 
-        const appId = parseInt(res.match[3]);
-
+        const appId = parseInt(msg.match[3]);
         if (appId) {
-            authenticate(res, (err, token) => {
+            authenticate(msg, (err, token) => {
                 if (err)
                     return robot.logger.error(err);
 
-                res.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/releases`))
+                msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/releases`))
                     .headers({
                         'authorization': `Bearer ${token}`,
                         'content-type': 'application/octet-stream'
@@ -100,24 +99,24 @@ module.exports = (robot: any) => {
                                         \n${FoDApiHelper.getSiteUri(`/redirect/releases/${item.releaseId}`)}`;
                             });
 
-                            return res.reply(`Releases for App Id ${appId}: \n${items.join('\n')}`);
+                            return msg.reply(`Releases for App Id ${appId}: \n${items.join('\n')}`);
                         }
 
-                        return res.reply(`Sorry, I couldn't find anything.`);
+                        return msg.reply(`Sorry, I couldn't find anything.`);
                     });
             });
         }
     });
 
-    robot.respond(/(show |list )?scans( for)? app (.\d+)/i, (res: any) => {
-        const appId = parseInt(res.match[3]);
-
+    robot.respond(/(show |list )?scans( for)? app (.\d+)/i, (msg: any) => {
+        
+        const appId = parseInt(msg.match[3]);
         if (appId) {
-            authenticate(res, (err, token) => {
+            authenticate(msg, (err, token) => {
                 if (err)
                     return robot.logger.error(err);
 
-                res.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/scans?limit=3`))
+                msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/scans?limit=3`))
                     .headers({
                         'authorization': `Bearer ${token}`,
                         'content-type': 'application/octet-stream'
@@ -134,33 +133,32 @@ module.exports = (robot: any) => {
                                 if (parsedBody && parsedBody.totalCount) {
                                     const items = parsedBody.items.map((item: any) => {
                                         return `${item.scanType} Scan  --  Completed On: ${item.completedDateTime} -- ${item.totalIssues} Issues \
-                                        \n${FoDApiHelper.getSiteUri()}/redirect/releases/${item.releaseId}`;
+                                                \n${FoDApiHelper.getSiteUri()}/redirect/releases/${item.releaseId}`;
                                     });
 
-                                    return res.reply(`Three most recent scans for App Id ${appId}: \n${items.join('\n')}`);
+                                    return msg.reply(`Three most recent scans for App Id ${appId}: \n${items.join('\n')}`);
                                 }
 
-                                return res.reply(`Sorry, I couldn't find anything.`);
+                                return msg.reply(`Sorry, I couldn't find anything.`);
 
                             case 404:
-                                return res.reply(`Sorry, I couldn't find anything.`);
+                                return msg.reply(`Sorry, I couldn't find anything.`);
                         }
                     });
             });
         }
     });
 
-    robot.respond(/(show |list )?reports( for)? app (.\d+)/i, (res: any) => {
-        const appId = parseInt(res.match[3]);
+    robot.respond(/(show |list )?reports( for)? app (.\d+)/i, (msg: any) => {
 
-
+        const appId = parseInt(msg.match[3]);
         if (appId) {
 
-            authenticate(res, (err, token) => {
+            authenticate(msg, (err, token) => {
                 if (err)
                     return robot.logger.error(err);
 
-                res.http(FoDApiHelper.getApiUri(`/api/v3/reports?filters=applicationId%3A${appId}%2BreportStatusTypeId%3A2&fields=none`))
+                msg.http(FoDApiHelper.getApiUri(`/api/v3/reports?filters=applicationId%3A${appId}%2BreportStatusTypeId%3A2&fields=none`))
                     .headers({
                         'authorization': `Bearer ${token}`,
                         'content-type': 'application/octet-stream'
@@ -176,7 +174,7 @@ module.exports = (robot: any) => {
 
                                 if (countResult > 0) {
                                     const limit = 3;
-                                    res.http(FoDApiHelper.getApiUri(`/api/v3/reports?applicationId%3A${appId}}%2BreportStatusTypeId%3A2&orderBy=reportId&offset=${countResult - limit}&limit=${limit}`))
+                                    msg.http(FoDApiHelper.getApiUri(`/api/v3/reports?applicationId%3A${appId}}%2BreportStatusTypeId%3A2&orderBy=reportId&offset=${countResult - limit}&limit=${limit}`))
                                         .headers({
                                             'authorization': `Bearer ${token}`,
                                             'content-type': 'application/octet-stream'
@@ -190,18 +188,17 @@ module.exports = (robot: any) => {
                                             if (result && result.items) {
                                                 let items = result.items.map((item: any) => {
                                                     return `${item.reportName} -- ${item.reportType}\
-                                                        \n${FoDApiHelper.getSiteUri(`/reports/downloadreport?reportId=${item.reportId}`)}`;
+                                                            \n${FoDApiHelper.getSiteUri(`/reports/downloadreport?reportId=${item.reportId}`)}`;
                                                 }).reverse();
 
-                                                return res.reply(items.join('\n'));
+                                                return msg.reply(items.join('\n'));
                                             }
 
-                                            return res.reply(`Sorry, I couldn't find anything.`);
+                                            return msg.reply(`Sorry, I couldn't find anything.`);
                                         });
                                 }
                         }
                     });
-
             });
         }
     });
