@@ -85,3 +85,7 @@ npm install /path/to/hubot-fod
 ```
 
 Then you can restart Hubot and he should be running your local version.  Simply run the install again when you want to test your changes.
+
+## License
+
+MIT License Copyright (c) 2016 Matt Gibbs
