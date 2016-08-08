@@ -202,4 +202,9 @@ module.exports = (robot: any) => {
             });
         }
     });
+    robot.respond(/(show |list |get |link )?(the )?issue ([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/i, 
+    (msg: any) => {
+        const issueId = msg.match[3];
+        msg.reply(`${FoDApiHelper.getSiteUri()}/redirect/issues/${issueId}`);
+    });
 };
