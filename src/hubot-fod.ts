@@ -5,6 +5,13 @@
 //   HUBOT_FOD_APIKEY (FoD API Key)
 //   HUBOT_FOD_APISECRET (FoD API Secret)
 //   HUBOT_FOD_BASEURI (optional, only necessary if your account is not located in the US.)
+//
+// Commands:
+//    hubot list apps - Lists applications
+//    hubot list releases app <id> - Lists the releases for App <id>
+//    hubot list reports app <id> - Lists the last 3 completed reports for App <id>
+//    hubot list scans app <id> - Lists the 3 most recent scans for App <id>
+//
 
 import {FoDApiHelper} from './util/fod-api-helper';
 import * as qs from 'querystring';
