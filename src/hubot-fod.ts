@@ -123,7 +123,11 @@ module.exports = (robot: any) => {
                 if (err)
                     return robot.logger.error(err);
 
-                msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/scans?limit=3`))
+                const q = qs.stringify({
+                    limit: 3
+                });
+
+                msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/scans?${q}`))
                     .headers({
                         'authorization': `Bearer ${token}`,
                         'content-type': 'application/octet-stream'
@@ -165,7 +169,13 @@ module.exports = (robot: any) => {
                 if (err)
                     return robot.logger.error(err);
 
-                msg.http(FoDApiHelper.getApiUri(`/api/v3/reports?filters=applicationId%3A${appId}%2BreportStatusTypeId%3A2&fields=none`))
+                const q = qs.stringify({
+                    reportStatusTypeId: 2,
+                    applicationId: appId,
+                    fields: 'none'
+                });
+
+                msg.http(FoDApiHelper.getApiUri(`/api/v3/reports?${q}`))
                     .headers({
                         'authorization': `Bearer ${token}`,
                         'content-type': 'application/octet-stream'
@@ -180,8 +190,17 @@ module.exports = (robot: any) => {
                                 const countResult: number = JSON.parse(body).totalCount || 0;
 
                                 if (countResult > 0) {
+
                                     const limit = 3;
-                                    msg.http(FoDApiHelper.getApiUri(`/api/v3/reports?applicationId%3A${appId}}%2BreportStatusTypeId%3A2&orderBy=reportId&offset=${countResult - limit}&limit=${limit}`))
+                                    const q = qs.stringify({
+                                        reportStatusTypeId: 2,
+                                        applicationId: appId,
+                                        offset: countResult - limit,
+                                        limit: limit,
+                                        orderBy: 'reportId',
+                                    });
+
+                                    msg.http(FoDApiHelper.getApiUri(`/api/v3/reports?${q}`))
                                         .headers({
                                             'authorization': `Bearer ${token}`,
                                             'content-type': 'application/octet-stream'
