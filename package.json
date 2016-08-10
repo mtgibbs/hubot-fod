@@ -23,7 +23,8 @@
     "hubot",
     "hubot-script",
     "fortify",
-    "fod"
+    "fod",
+    "fortify on demand"
   ],
   "devDependencies": {
     "concurrently": "2.2.0",
