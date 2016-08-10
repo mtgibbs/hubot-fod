@@ -11,7 +11,7 @@
 //    hubot list releases app <id> - Lists the releases for App <id>
 //    hubot list reports app <id> - Lists the last 3 completed reports for App <id>
 //    hubot list scans app <id> - Lists the 3 most recent scans for App <id>
-//
+//    hubot show issue <id> - Links directly to the given Issue of <id>
 
 import {FoDApiHelper} from './util/fod-api-helper';
 import * as qs from 'querystring';
