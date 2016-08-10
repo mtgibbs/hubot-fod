@@ -143,7 +143,7 @@ module.exports = (robot: any) => {
         }
     });
 
-    robot.respond(/(show |list )?scans( for)? app (.\d+)/i, (msg: any) => {
+    robot.respond(/(show |list )?scans (for|app|for app) (.\d+)/i, (msg: any) => {
 
         const appId = parseInt(msg.match[3]);
         if (appId) {
@@ -188,7 +188,7 @@ module.exports = (robot: any) => {
         }
     });
 
-    robot.respond(/(show |list )?reports( for)? app (.\d+)/i, (msg: any) => {
+    robot.respond(/(show |list )?reports (for|app|for app) (.\d+)/i, (msg: any) => {
 
         const appId = parseInt(msg.match[3]);
         if (appId) {
