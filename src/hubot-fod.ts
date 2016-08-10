@@ -94,13 +94,25 @@ module.exports = (robot: any) => {
         });
     });
 
-    robot.respond(/(show |list )?releases( for)? app (.\d+)/i, (msg: any) => {
+    robot.respond(/(show |list )?releases (for|app|for app) (.\d+)( page \d+)?/i, (msg: any) => {
+
+        let pageNo = 1;
+        if (msg.match[4]) {
+            // unfortunately javascript regex doesn't do lookbehind, so I'm doing this for now     
+            pageNo = parseInt(msg.match[4].replace(/[a-zA-z\s]+/, ''));
+        }
 
         const appId = parseInt(msg.match[3]);
         if (appId) {
             authenticate(msg, (err, token) => {
                 if (err)
                     return robot.logger.error(err);
+
+                const limit = 5;
+                const q = qs.stringify({
+                    limit: limit,
+                    offset: (pageNo - 1) * limit
+                });
 
                 msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/releases`))
                     .headers({
@@ -114,12 +126,15 @@ module.exports = (robot: any) => {
                         const parsedBody = JSON.parse(body);
 
                         if (parsedBody && parsedBody.totalCount) {
+                            const totalPages = Math.floor(parsedBody.totalCount / limit) + 1;
+                            const appName = parsedBody.items[0].applicationName;
                             const items = parsedBody.items.map((item: any) => {
                                 return `[${item.releaseId}] [${item.isPassed ? 'PASSING' : 'FAILING'}] -- ${item.releaseName} -- Latest Scan Status: ${item.currentAnalysisStatusType} \
                                         \n${FoDApiHelper.getSiteUri(`/redirect/releases/${item.releaseId}`)}`;
                             });
 
-                            return msg.reply(`Releases for App Id ${appId}: \n${items.join('\n')}`);
+                            return msg.reply(`Showing page ${pageNo} for [${appId}] -- ${appName}.  Total Pages: ${totalPages} \
+                                              \n${items.join('\n')}`);
                         }
 
                         return msg.reply(`Sorry, I couldn't find anything.`);
