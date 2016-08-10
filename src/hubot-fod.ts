@@ -49,14 +49,26 @@ function authenticate(msg: any, callback: (err: any, token?: string) => void) {
 
 module.exports = (robot: any) => {
 
-    robot.respond(/(show |list )?(apps|applications)/i, (msg: any) => {
+    robot.respond(/(show |list )?(apps|applications)( page \d+)?/i, (msg: any) => {
+
+        let pageNo = 1;
+        if (msg.match[3]) {
+            // unfortunately javascript regex doesn't do lookbehind, so I'm doing this for now     
+            pageNo = parseInt(msg.match[3].replace(/[a-zA-z\s]+/, ''));
+        }
 
         authenticate(msg, (err, token) => {
 
             if (err)
                 return robot.logger.error(err);
 
-            msg.http(FoDApiHelper.getApiUri('/api/v3/applications'))
+            const limit = 5;
+            const q = qs.stringify({
+                limit: limit,
+                offset: (pageNo - 1) * limit
+            });
+
+            msg.http(FoDApiHelper.getApiUri(`/api/v3/applications?${q}`))
                 .headers({
                     'authorization': `Bearer ${token}`,
                     'content-type': 'application/octet-stream'
@@ -72,8 +84,9 @@ module.exports = (robot: any) => {
                             return `[${item.applicationId}] -- ${item.applicationName} \
                                     \n${FoDApiHelper.getSiteUri(`/redirect/applications/${item.applicationId}`)}`;
                         });
-
-                        return msg.reply(`\n${items.join('\n')}`);
+                        const totalPages = Math.floor(parsedBody.totalCount / limit) + 1;
+                        return msg.reply(`Showing page ${pageNo}.  Total Pages: ${totalPages} \
+                                          \n${items.join('\n')}`);
                     }
 
                     return msg.reply(`Sorry, I couldn't find anything.`);
