@@ -256,8 +256,7 @@ module.exports = (robot: any) => {
             });
         }
     });
-    robot.respond(/(show |list |get |link )?(the )?issue (.\d+)/i, 
-    (msg: any) => {
+    robot.respond(/(show |list |get |link )?(the )?issue (.\d+)/i, (msg: any) => {
         const issueId = msg.match[3];
         msg.reply(`${FoDApiHelper.getSiteUri()}/Redirect/LatestScanIssues/${issueId}`);
     });
