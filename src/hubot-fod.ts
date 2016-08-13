@@ -16,7 +16,7 @@
 import {FoDApiHelper} from './util/fod-api-helper';
 import * as qs from 'querystring';
 
-function authenticate(msg: any, callback: (err: any, token?: string) => void) {
+const authenticate = (msg: any, callback: (err: any, token?: string) => void) => {
 
     const body = qs.stringify({
         grant_type: 'client_credentials',
@@ -45,7 +45,7 @@ function authenticate(msg: any, callback: (err: any, token?: string) => void) {
                     return callback('Error authenticating with Fortify on Demand - InternalServerError');
             }
         });
-}
+};
 
 module.exports = (robot: any) => {
 
