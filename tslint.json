@@ -9,6 +9,11 @@
             true,
             "spaces"
         ],
+        "no-console": [
+            true,
+            "log",
+            "error"
+        ],
         "no-duplicate-variable": true,
         "no-eval": true,
         "no-internal-module": true,
