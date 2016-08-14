@@ -21,7 +21,7 @@ import * as Promise from 'promise';
 
 const authenticate = (msg: any): Promise.IThenable<string> => {
 
-    return new Promise((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
 
         const body = qs.stringify({
             grant_type: 'client_credentials',
