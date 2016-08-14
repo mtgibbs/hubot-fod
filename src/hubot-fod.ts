@@ -11,11 +11,12 @@
 //    hubot list releases app <id> - Lists the releases for App <id>
 //    hubot list reports app <id> - Lists the last 3 completed reports for App <id>
 //    hubot list scans app <id> - Lists the 3 most recent scans for App <id>
+//    hubot issues release <id> - Gives the Issue Count breakdown for Release <id>
 //
 
 /// <reference path="../typings/index.d.ts" />
 
-import {FoDApiHelper} from './util/fod-api-helper';
+import {FoDApiHelper, ISeverityCountResult} from './util/fod-api-helper';
 import * as qs from 'querystring';
 import * as Promise from 'promise';
 
@@ -295,6 +296,71 @@ module.exports = (robot: any) => {
                 })
                 .then((text) => {
                     msg.reply(text);
+                })
+                .catch((err) => {
+                    robot.logger.error(err);
+                });
+        }
+    });
+
+    robot.respond(/(show details|tell me about|details|about|issues) release (.\d+)/i, (msg: any) => {
+
+        const releaseId = parseInt(msg.match[2]);
+        if (releaseId) {
+            authenticate(msg)
+                .then((token) => {
+
+                    const promises: Array<Promise.IThenable<ISeverityCountResult>> = [];
+
+                    // hard coded values for the severityIds that come back
+                    [1, 2, 3, 4].forEach((severity) => {
+                        const q = qs.stringify({
+                            fields: 'severityString',
+                            limit: 1,
+                            filters: `severity:${severity}+isSuppressed:false`,
+                            excludeFilters: true
+                        });
+
+                        promises.push(
+                            new Promise<ISeverityCountResult>((resolve, reject) => {
+                                msg.http(FoDApiHelper.getApiUri(`/api/v3/releases/${releaseId}/vulnerabilities?${q}`))
+                                    .headers({
+                                        'authorization': `Bearer ${token}`,
+                                        'content-type': 'application/octet-stream'
+                                    })
+                                    .get()((err: any, res: any, body: any) => {
+                                        if (err)
+                                            return reject(err);
+
+                                        const result = JSON.parse(body);
+
+                                        if (result && result.totalCount && result.items) {
+                                            return resolve({ severityId: severity, severityType: result.items[0].severityString, count: result.totalCount });
+                                        }
+
+                                        return resolve(null);
+                                    });
+                            }));
+                    });
+
+                    return Promise.all(promises);
+                })
+                .then((result: Array<ISeverityCountResult>) => {
+
+                    if (result && result.length) {
+                        const severityResults = result
+                            .filter(item => { return item !== null; })
+                            .sort((a, b) => { return b.severityId - a.severityId; })
+                            .map(item => {
+                                return `${item.severityType}: ${item.count}`;
+                            })
+                            .join('\n');
+
+                        return msg.reply(`\nHere is the latest issue breakdown for Release ${releaseId}: \
+                                          \n${severityResults}`);
+                    }
+
+                    return msg.reply(`There aren't any issues for Release ${releaseId}`);
                 })
                 .catch((err) => {
                     robot.logger.error(err);

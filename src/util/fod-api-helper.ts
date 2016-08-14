@@ -19,3 +19,9 @@ export class FoDApiHelper {
         return uri;
     }
 }
+
+export interface ISeverityCountResult {
+    severityId: number;
+    severityType: string;
+    count: number;
+}
