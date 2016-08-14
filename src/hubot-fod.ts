@@ -90,7 +90,7 @@ module.exports = (robot: any) => {
                                 const totalPages = Math.floor(parsedBody.totalCount / limit) + 1;
                                 const items = parsedBody.items.map((item: any) => {
                                     return `[${item.applicationId}] -- ${item.applicationName} \
-                                    \n${FoDApiHelper.getSiteUri(`/redirect/applications/${item.applicationId}`)}`;
+                                            \n${FoDApiHelper.getSiteUri(`/redirect/applications/${item.applicationId}`)}`;
                                 });
 
                                 return resolve(`Showing page ${pageNo}.  Total Pages: ${totalPages} \
