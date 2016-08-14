@@ -60,7 +60,7 @@ module.exports = (robot: any) => {
         let pageNo = 1;
         if (msg.match[3]) {
             // unfortunately javascript regex doesn't do lookbehind, so I'm doing this for now     
-            pageNo = parseInt(msg.match[3].replace(/[a-zA-z\s]+/, ''));
+            pageNo = Math.max(parseInt(msg.match[3].replace(/[a-zA-z\s]+/, '')), 1);
         }
 
         authenticate(msg)
@@ -115,7 +115,7 @@ module.exports = (robot: any) => {
         let pageNo = 1;
         if (msg.match[4]) {
             // unfortunately javascript regex doesn't do lookbehind, so I'm doing this for now     
-            pageNo = parseInt(msg.match[4].replace(/[a-zA-z\s]+/, ''));
+            pageNo = Math.max(parseInt(msg.match[4].replace(/[a-zA-z\s]+/, '')), 1);
         }
 
         const appId = parseInt(msg.match[3]);
@@ -262,7 +262,7 @@ module.exports = (robot: any) => {
                             const q = qs.stringify({
                                 reportStatusTypeId: 2,
                                 applicationId: appId,
-                                offset: count - limit,
+                                offset: Math.max(count - limit, 0),
                                 limit: limit,
                                 orderBy: 'reportId',
                             });
