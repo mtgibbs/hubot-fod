@@ -147,7 +147,7 @@ module.exports = (robot: any) => {
                                     const appName = parsedBody.items[0].applicationName;
                                     const items = parsedBody.items.map((item: any) => {
                                         return `[${item.releaseId}] [${item.isPassed ? 'PASSING' : 'FAILING'}] -- ${item.releaseName} -- Latest Scan Status: ${item.currentAnalysisStatusType} \
-                                        \n${FoDApiHelper.getSiteUri(`/redirect/releases/${item.releaseId}`)}`;
+                                                \n${FoDApiHelper.getSiteUri(`/redirect/releases/${item.releaseId}`)}`;
                                     });
 
                                     return resolve(`Showing page ${pageNo} for [${appId}] -- ${appName}.  Total Pages: ${totalPages} \
@@ -198,7 +198,7 @@ module.exports = (robot: any) => {
                                         if (parsedBody && parsedBody.totalCount) {
                                             const items = parsedBody.items.map((item: any) => {
                                                 return `${item.scanType} Scan  --  Completed On: ${item.completedDateTime} -- ${item.totalIssues} Issues \
-                                                \n${FoDApiHelper.getSiteUri()}/redirect/releases/${item.releaseId}`;
+                                                        \n${FoDApiHelper.getSiteUri()}/redirect/releases/${item.releaseId}`;
                                             });
 
                                             return resolve(`Three most recent scans for App Id ${appId}: \n${items.join('\n')}`);
@@ -281,7 +281,7 @@ module.exports = (robot: any) => {
                                     if (result && result.items) {
                                         let items = result.items.map((item: any) => {
                                             return `${item.reportName} -- ${item.reportType}\
-                                                            \n${FoDApiHelper.getSiteUri(`/reports/downloadreport?reportId=${item.reportId}`)}`;
+                                                    \n${FoDApiHelper.getSiteUri(`/reports/downloadreport?reportId=${item.reportId}`)}`;
                                         }).reverse();
 
                                         return resolve(items.join('\n'));
