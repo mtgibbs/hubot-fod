@@ -276,10 +276,10 @@ module.exports = (robot: any) => {
                                     if (err)
                                         return reject(err);
 
-                                    let result = JSON.parse(body);
+                                    const result = JSON.parse(body);
 
                                     if (result && result.items) {
-                                        let items = result.items.map((item: any) => {
+                                        const items = result.items.map((item: any) => {
                                             return `${item.reportName} -- ${item.reportType}\
                                                     \n${FoDApiHelper.getSiteUri(`/reports/downloadreport?reportId=${item.reportId}`)}`;
                                         }).reverse();
