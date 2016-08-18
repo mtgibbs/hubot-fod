@@ -8,7 +8,7 @@
 //
 // Commands:
 //    hubot list apps - Lists applications
-//    hubot list releases app <id> - Lists the releases for App <id>
+//    hubot list (passing|failing)? releases app <id> - Lists the releases for App <id>
 //    hubot list reports app <id> - Lists the last 3 completed reports for App <id>
 //    hubot list scans app <id> - Lists the 3 most recent scans for App <id>
 //    hubot issues release <id> - Gives the Issue Count breakdown for Release <id>
@@ -111,15 +111,19 @@ module.exports = (robot: any) => {
             });
     });
 
-    robot.respond(/(show |list )?releases (for|app|for app) (.\d+)( page \d+)?/i, (msg: any) => {
+    robot.respond(/(show |list )?(failing |passing )?releases (for|app|for app) (.\d+)( page \d+)?/i, (msg: any) => {
 
         let pageNo = 1;
-        if (msg.match[4]) {
-            // unfortunately javascript regex doesn't do lookbehind, so I'm doing this for now     
-            pageNo = Math.max(parseInt(msg.match[4].replace(/[a-zA-z\s]+/, '')), 1);
-        }
+        let isPassing: boolean = null;
 
-        const appId = parseInt(msg.match[3]);
+        if (msg.match[2])
+            isPassing = msg.match[2].trim() === 'passing';
+
+        // unfortunately javascript regex doesn't do lookbehind, so I'm doing this for now
+        if (msg.match[5])
+            pageNo = Math.max(parseInt(msg.match[5].replace(/[a-zA-z\s]+/, '')), 1);
+
+        const appId = parseInt(msg.match[4]);
         if (appId) {
 
             authenticate(msg)
@@ -127,12 +131,18 @@ module.exports = (robot: any) => {
 
                     return new Promise<string>((resolve, reject) => {
                         const limit = 5;
-                        const q = qs.stringify({
+
+                        const queryObj: any = {
                             limit: limit,
                             offset: (pageNo - 1) * limit
-                        });
+                        };
 
-                        msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/releases`))
+                        if (isPassing !== null)
+                            queryObj.filters = `isPassed:${isPassing}`;
+
+                        const q = qs.stringify(queryObj);
+
+                        msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/releases?${q}`))
                             .headers({
                                 'authorization': `Bearer ${token}`,
                                 'content-type': 'application/octet-stream'
