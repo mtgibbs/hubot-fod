@@ -380,27 +380,33 @@ module.exports = (robot: any) => {
     robot.respond(/(show |list |get |link )?(the )?issue (\d+)/i, (msg: any) => {
         const issueId = msg.match[3];
         if (issueId) {
-            authenticate(msg, (err, token) => {
-                if (err)
-                    return robot.logger.error(err);
+            authenticate(msg)
+                .then((token) => {
+                    return new Promise<string>((resolve, reject) => {
+                        msg.http(FoDApiHelper.getApiUri(`/api/v3/vulnerabilities/${issueId}`))
+                            .headers({
+                                'authorization': `Bearer ${token}`,
+                                'content-type': 'application/octet-stream'
+                            })
+                            .get()((err: any, res: any, body: any) => {
+                                if (err)
+                                    return reject(err);
 
-                msg.http(FoDApiHelper.getApiUri(`/api/v3/vulnerabilities/${issueId}`))
-                    .headers({
-                        'authorization': `Bearer ${token}`,
-                        'content-type': 'application/octet-stream'
-                    })
-                    .get()((err: any, res: any, body: any) => {
-                        if (err)
-                            return robot.logger.error(err);
-
-                        switch (res.statusCode) {
-                            case 200:
-                                return msg.reply(`${FoDApiHelper.getSiteUri()}/Redirect/LatestScanIssues/${issueId}`);
-                            default:
-                                return msg.reply(`Sorry, I couldn't find anything.`);
-                        }
+                                switch (res.statusCode) {
+                                    case 200:
+                                        return resolve(`${FoDApiHelper.getSiteUri()}/Redirect/LatestScanIssues/${issueId}`);
+                                    default:
+                                        return resolve(`Sorry, but I couldn't find Issue ${issueId}.`);
+                                }
+                            });
                     });
-            });
+                })
+                .then((text) => {
+                    msg.reply(text);
+                })
+                .catch((err) => {
+                    robot.logger.error(err);
+                });
         }
     });
 };
