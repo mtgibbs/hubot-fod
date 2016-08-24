@@ -11,8 +11,8 @@
 //    hubot list (passing|failing)? releases app <id> - Lists the releases for App <id>
 //    hubot list reports app <id> - Lists the last 3 completed reports for App <id>
 //    hubot list scans app <id> - Lists the 3 most recent scans for App <id>
+//    hubot show issue <id> - Links directly to the given Issue of <id>
 //    hubot issues release <id> - Gives the Issue Count breakdown for Release <id>
-//
 
 /// <reference path="../typings/index.d.ts" />
 
@@ -371,6 +371,38 @@ module.exports = (robot: any) => {
                     }
 
                     return msg.reply(`There aren't any issues for Release ${releaseId}`);
+                })
+                .catch((err) => {
+                    robot.logger.error(err);
+                });
+        }
+    });
+    robot.respond(/(show |list |get |link )?(the )?issue (\d+)/i, (msg: any) => {
+        const issueId = msg.match[3];
+        if (issueId) {
+            authenticate(msg)
+                .then((token) => {
+                    return new Promise<string>((resolve, reject) => {
+                        msg.http(FoDApiHelper.getApiUri(`/api/v3/vulnerabilities/${issueId}`))
+                            .headers({
+                                'authorization': `Bearer ${token}`,
+                                'content-type': 'application/octet-stream'
+                            })
+                            .get()((err: any, res: any, body: any) => {
+                                if (err)
+                                    return reject(err);
+
+                                switch (res.statusCode) {
+                                    case 200:
+                                        return resolve(`${FoDApiHelper.getSiteUri()}/Redirect/LatestScanIssues/${issueId}`);
+                                    default:
+                                        return resolve(`Sorry, but I couldn't find Issue ${issueId}.`);
+                                }
+                            });
+                    });
+                })
+                .then((text) => {
+                    msg.reply(text);
                 })
                 .catch((err) => {
                     robot.logger.error(err);
