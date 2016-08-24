@@ -25,3 +25,12 @@ export interface ISeverityCountResult {
     severityType: string;
     count: number;
 }
+
+export enum SeverityType {
+    Low = 1,
+    Medium = 2,
+    High = 3,
+    Critical = 4,
+    BestPractice = -1,
+    Info = -2
+}

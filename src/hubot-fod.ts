@@ -16,7 +16,7 @@
 
 /// <reference path="../typings/index.d.ts" />
 
-import {FoDApiHelper, ISeverityCountResult} from './util/fod-api-helper';
+import {FoDApiHelper, ISeverityCountResult, SeverityType} from './util/fod-api-helper';
 import * as qs from 'querystring';
 import * as Promise from 'promise';
 
@@ -322,8 +322,7 @@ module.exports = (robot: any) => {
 
                     const promises: Array<Promise.IThenable<ISeverityCountResult>> = [];
 
-                    // hard coded values for the severityIds that come back
-                    [1, 2, 3, 4].forEach((severity) => {
+                    [SeverityType.Low, SeverityType.Medium, SeverityType.High, SeverityType.Critical].forEach((severity) => {
                         const q = qs.stringify({
                             fields: 'severityString',
                             limit: 1,
