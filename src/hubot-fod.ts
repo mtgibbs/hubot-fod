@@ -7,8 +7,8 @@
 //   HUBOT_FOD_BASEURI (optional, only necessary if your account is not located in the US.)
 //
 // Commands:
-//    hubot list apps - Lists applications
-//    hubot list (passing|failing)? releases app <id> - Lists the releases for App <id>
+//    hubot list apps (page <int>)? - Lists applications
+//    hubot list (passing|failing)? releases app <id> (page <int>)? - Lists the releases for App <id>
 //    hubot list reports app <id> - Lists the last 3 completed reports for App <id>
 //    hubot list scans app <id> - Lists the 3 most recent scans for App <id>
 //    hubot show issue <id> - Links directly to the given Issue for <id>
