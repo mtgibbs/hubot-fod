@@ -12,6 +12,10 @@
     "lint": "tslint -c ./tslint.json ./**/*.ts"
   },
   "author": "Matt Gibbs <matt@mtgibbs.xyz> (http://mtgibbs.xyz)",
+  "contributors": [
+    "Matt Gibbs <matt@mtgibbs.xyz> (http://mtgibbs.xyz)",
+    "Pete Beegle <pete.beegle@gmail.com> (https://github.com/petebeegle)"
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:mtgibbs/hubot-fod.git"
