@@ -1,6 +1,6 @@
 {
   "name": "hubot-fod",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Hubot Script for communicating with HPE Fortify on Demand.",
   "main": "./dist/index.js",
   "scripts": {
