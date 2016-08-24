@@ -356,8 +356,7 @@ module.exports = (robot: any) => {
                     return Promise.all(promises);
                 })
                 .then((result: Array<ISeverityCountResult>) => {
-
-                    if (result && result.length) {
+                    if (result && result.some(item => { return item !== null; })) {
                         const severityResults = result
                             .filter(item => { return item !== null; })
                             .sort((a, b) => { return b.severityId - a.severityId; })
