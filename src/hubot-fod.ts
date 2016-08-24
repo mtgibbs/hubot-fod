@@ -376,6 +376,7 @@ module.exports = (robot: any) => {
                 });
         }
     });
+
     robot.respond(/(show |list |get |link )?(the )?issue (\d+)/i, (msg: any) => {
         const issueId = msg.match[3];
         if (issueId) {
@@ -393,7 +394,7 @@ module.exports = (robot: any) => {
 
                                 switch (res.statusCode) {
                                     case 200:
-                                        return resolve(`${FoDApiHelper.getSiteUri()}/Redirect/LatestScanIssues/${issueId}`);
+                                        return resolve(`${FoDApiHelper.getSiteUri()}/Redirect/Issues/${issueId}`);
                                     default:
                                         return resolve(`Sorry, but I couldn't find Issue ${issueId}.`);
                                 }
