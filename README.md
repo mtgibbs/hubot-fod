@@ -18,7 +18,9 @@ Add **hubot-fod** to your external-scripts.json
 ["hubot-fod"]
 ```
 
-## Commands
+## Usage
+
+### Commands
 
 Here is a list of available commands shown in the hubot help menu.  
 
@@ -32,6 +34,16 @@ Here is a list of available commands shown in the hubot help menu.
 | hubot **issues release \<id>**                                             | Gives the Issue Count breakdown for Release \<id> |
 
 Additional verbiage is supported in some cases.  If you are interested, you can take a look at the regex for matching the command in the script.
+
+### Examples
+
+```
+hubot list apps page 1
+hubot show issue 48173817
+hubot list reports app 45727
+hubot issues release 183748908
+hubot list passing releases for app 3212 page 2
+```
 
 ## Environment Variables
 
