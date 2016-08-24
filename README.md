@@ -1,5 +1,5 @@
 # hubot-fod
-Hubot Script for interacting with Fortify on Demand (Prototype)
+Hubot Script for interacting with Fortify on Demand
 
 [![NPM Version](https://img.shields.io/npm/v/hubot-fod.svg)](https://www.npmjs.com/package/hubot-fod)
 [![Build Status](https://travis-ci.org/mtgibbs/hubot-fod.svg?branch=master)](https://travis-ci.org/mtgibbs/hubot-fod)
@@ -47,6 +47,12 @@ Please be careful with these values in the case where you are automating your bo
 ```
 export HUBOT_FOD_BASEURI="hpfod.com"
 ```
+
+## Contributing
+
+If you have any ideas for features that would be helpful to you, please feel free to open an issue to discuss it.
+
+If you would like to write a feature, you can refer to the [Fortify on Demand API Swagger Page](https://api.hpfod.com/swagger/ui/index#/) for help with calling the API should the feature require it.
 
 ## Developer Setup
 

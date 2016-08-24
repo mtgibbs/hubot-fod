@@ -8,44 +8,51 @@
 //
 // Commands:
 //    hubot list apps - Lists applications
-//    hubot list releases app <id> - Lists the releases for App <id>
+//    hubot list (passing|failing)? releases app <id> - Lists the releases for App <id>
 //    hubot list reports app <id> - Lists the last 3 completed reports for App <id>
 //    hubot list scans app <id> - Lists the 3 most recent scans for App <id>
 //    hubot show issue <id> - Links directly to the given Issue of <id>
+//    hubot issues release <id> - Gives the Issue Count breakdown for Release <id>
 
-import {FoDApiHelper} from './util/fod-api-helper';
+/// <reference path="../typings/index.d.ts" />
+
+import {FoDApiHelper, ISeverityCountResult} from './util/fod-api-helper';
 import * as qs from 'querystring';
+import * as Promise from 'promise';
 
-function authenticate(msg: any, callback: (err: any, token?: string) => void) {
+const authenticate = (msg: any): Promise.IThenable<string> => {
 
-    const body = qs.stringify({
-        grant_type: 'client_credentials',
-        scope: 'https://hpfod.com/tenant',
-        client_id: process.env.HUBOT_FOD_APIKEY,
-        client_secret: process.env.HUBOT_FOD_APISECRET
-    });
+    return new Promise<string>((resolve, reject) => {
 
-    msg.http(FoDApiHelper.getApiUri('/oauth/token'))
-        .header('Content-Type', 'application/x-www-form-urlencoded')
-        .post(body)((err: any, res: any, body: any) => {
-            if (err)
-                return callback(err);
-
-            switch (res.statusCode) {
-                case 200:
-                    const responseObject = JSON.parse(body);
-
-                    if (responseObject.access_token) {
-                        return callback(null, responseObject.access_token);
-                    }
-
-                    return callback('Error authenticating with Fortify on Demand - Authentication Failed');
-
-                default:
-                    return callback('Error authenticating with Fortify on Demand - InternalServerError');
-            }
+        const body = qs.stringify({
+            grant_type: 'client_credentials',
+            scope: 'https://hpfod.com/tenant',
+            client_id: process.env.HUBOT_FOD_APIKEY,
+            client_secret: process.env.HUBOT_FOD_APISECRET
         });
-}
+
+        msg.http(FoDApiHelper.getApiUri('/oauth/token'))
+            .header('Content-Type', 'application/x-www-form-urlencoded')
+            .post(body)((err: any, res: any, body: any) => {
+                if (err)
+                    return reject(err);
+
+                switch (res.statusCode) {
+                    case 200:
+                        const responseObject = JSON.parse(body);
+
+                        if (responseObject.access_token) {
+                            return resolve(responseObject.access_token);
+                        }
+
+                        return reject('Error authenticating with Fortify on Demand - Authentication Failed');
+
+                    default:
+                        return reject('Error authenticating with Fortify on Demand - InternalServerError');
+                }
+            });
+    });
+};
 
 module.exports = (robot: any) => {
 
@@ -54,92 +61,121 @@ module.exports = (robot: any) => {
         let pageNo = 1;
         if (msg.match[3]) {
             // unfortunately javascript regex doesn't do lookbehind, so I'm doing this for now     
-            pageNo = parseInt(msg.match[3].replace(/[a-zA-z\s]+/, ''));
+            pageNo = Math.max(parseInt(msg.match[3].replace(/[a-zA-z\s]+/, '')), 1);
         }
 
-        authenticate(msg, (err, token) => {
+        authenticate(msg)
+            .then((token) => {
 
-            if (err)
-                return robot.logger.error(err);
+                return new Promise<string>((resolve, reject) => {
 
-            const limit = 5;
-            const q = qs.stringify({
-                limit: limit,
-                offset: (pageNo - 1) * limit
-            });
+                    const limit = 5;
+                    const q = qs.stringify({
+                        limit: limit,
+                        offset: (pageNo - 1) * limit
+                    });
 
-            msg.http(FoDApiHelper.getApiUri(`/api/v3/applications?${q}`))
-                .headers({
-                    'authorization': `Bearer ${token}`,
-                    'content-type': 'application/octet-stream'
-                })
-                .get()((err: any, res: any, body: any) => {
-                    if (err)
-                        return robot.logger.error(err);
+                    const get = msg
+                        .http(FoDApiHelper.getApiUri(`/api/v3/applications?${q}`))
+                        .headers({
+                            'authorization': `Bearer ${token}`,
+                            'content-type': 'application/octet-stream'
+                        })
+                        .get()((err: any, res: any, body: any) => {
+                            if (err)
+                                return reject(err);
 
-                    const parsedBody = JSON.parse(body);
+                            const parsedBody = JSON.parse(body);
 
-                    if (parsedBody.totalCount) {
-                        const items = parsedBody.items.map((item: any) => {
-                            return `[${item.applicationId}] -- ${item.applicationName} \
-                                    \n${FoDApiHelper.getSiteUri(`/redirect/applications/${item.applicationId}`)}`;
+                            if (parsedBody.totalCount) {
+                                const totalPages = Math.floor(parsedBody.totalCount / limit) + 1;
+                                const items = parsedBody.items.map((item: any) => {
+                                    return `[${item.applicationId}] -- ${item.applicationName} \
+                                            \n${FoDApiHelper.getSiteUri(`/redirect/applications/${item.applicationId}`)}`;
+                                });
+
+                                return resolve(`Showing page ${pageNo}.  Total Pages: ${totalPages} \
+                                                \n${items.join('\n')}`);
+
+                            }
+
+                            return resolve(`Sorry, I couldn't find anything.`);
                         });
-                        const totalPages = Math.floor(parsedBody.totalCount / limit) + 1;
-                        return msg.reply(`Showing page ${pageNo}.  Total Pages: ${totalPages} \
-                                          \n${items.join('\n')}`);
-                    }
-
-                    return msg.reply(`Sorry, I couldn't find anything.`);
                 });
-        });
+            })
+            .then((text) => {
+                msg.reply(text);
+            })
+            .catch((err) => {
+                robot.logger.error(err);
+            });
     });
 
-    robot.respond(/(show |list )?releases (for|app|for app) (.\d+)( page \d+)?/i, (msg: any) => {
+    robot.respond(/(show |list )?(failing |passing )?releases (for|app|for app) (.\d+)( page \d+)?/i, (msg: any) => {
 
         let pageNo = 1;
-        if (msg.match[4]) {
-            // unfortunately javascript regex doesn't do lookbehind, so I'm doing this for now     
-            pageNo = parseInt(msg.match[4].replace(/[a-zA-z\s]+/, ''));
-        }
+        let isPassing: boolean = null;
 
-        const appId = parseInt(msg.match[3]);
+        if (msg.match[2])
+            isPassing = msg.match[2].trim() === 'passing';
+
+        // unfortunately javascript regex doesn't do lookbehind, so I'm doing this for now
+        if (msg.match[5])
+            pageNo = Math.max(parseInt(msg.match[5].replace(/[a-zA-z\s]+/, '')), 1);
+
+        const appId = parseInt(msg.match[4]);
         if (appId) {
-            authenticate(msg, (err, token) => {
-                if (err)
-                    return robot.logger.error(err);
 
-                const limit = 5;
-                const q = qs.stringify({
-                    limit: limit,
-                    offset: (pageNo - 1) * limit
-                });
+            authenticate(msg)
+                .then((token) => {
 
-                msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/releases`))
-                    .headers({
-                        'authorization': `Bearer ${token}`,
-                        'content-type': 'application/octet-stream'
-                    })
-                    .get()((err: any, res: any, body: any) => {
-                        if (err)
-                            return robot.logger.error(err);
+                    return new Promise<string>((resolve, reject) => {
+                        const limit = 5;
 
-                        const parsedBody = JSON.parse(body);
+                        const queryObj: any = {
+                            limit: limit,
+                            offset: (pageNo - 1) * limit
+                        };
 
-                        if (parsedBody && parsedBody.totalCount) {
-                            const totalPages = Math.floor(parsedBody.totalCount / limit) + 1;
-                            const appName = parsedBody.items[0].applicationName;
-                            const items = parsedBody.items.map((item: any) => {
-                                return `[${item.releaseId}] [${item.isPassed ? 'PASSING' : 'FAILING'}] -- ${item.releaseName} -- Latest Scan Status: ${item.currentAnalysisStatusType} \
-                                        \n${FoDApiHelper.getSiteUri(`/redirect/releases/${item.releaseId}`)}`;
+                        if (isPassing !== null)
+                            queryObj.filters = `isPassed:${isPassing}`;
+
+                        const q = qs.stringify(queryObj);
+
+                        msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/releases?${q}`))
+                            .headers({
+                                'authorization': `Bearer ${token}`,
+                                'content-type': 'application/octet-stream'
+                            })
+                            .get()((err: any, res: any, body: any) => {
+                                if (err)
+                                    return reject(err);
+
+                                const parsedBody = JSON.parse(body);
+
+                                if (parsedBody && parsedBody.totalCount) {
+                                    const totalPages = Math.floor(parsedBody.totalCount / limit) + 1;
+                                    const appName = parsedBody.items[0].applicationName;
+                                    const items = parsedBody.items.map((item: any) => {
+                                        return `[${item.releaseId}] [${item.isPassed ? 'PASSING' : 'FAILING'}] -- ${item.releaseName} -- Latest Scan Status: ${item.currentAnalysisStatusType} \
+                                                \n${FoDApiHelper.getSiteUri(`/redirect/releases/${item.releaseId}`)}`;
+                                    });
+
+                                    return resolve(`Showing page ${pageNo} for [${appId}] -- ${appName}.  Total Pages: ${totalPages} \
+                                                    \n${items.join('\n')}`);
+                                }
+
+                                return resolve(`Sorry, I couldn't find anything.`);
                             });
-
-                            return msg.reply(`Showing page ${pageNo} for [${appId}] -- ${appName}.  Total Pages: ${totalPages} \
-                                              \n${items.join('\n')}`);
-                        }
-
-                        return msg.reply(`Sorry, I couldn't find anything.`);
                     });
-            });
+
+                })
+                .then((text) => {
+                    msg.reply(text);
+                })
+                .catch((err) => {
+                    robot.logger.error(err);
+                });
         }
     });
 
@@ -147,44 +183,53 @@ module.exports = (robot: any) => {
 
         const appId = parseInt(msg.match[3]);
         if (appId) {
-            authenticate(msg, (err, token) => {
-                if (err)
-                    return robot.logger.error(err);
 
-                const q = qs.stringify({
-                    limit: 3
-                });
+            authenticate(msg)
+                .then((token) => {
 
-                msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/scans?${q}`))
-                    .headers({
-                        'authorization': `Bearer ${token}`,
-                        'content-type': 'application/octet-stream'
-                    })
-                    .get()((err: any, res: any, body: any) => {
-                        if (err)
-                            return robot.logger.error(err);
+                    return new Promise<string>((resolve, reject) => {
+                        const q = qs.stringify({
+                            limit: 3
+                        });
 
-                        switch (res.statusCode) {
-                            case 200:
+                        msg.http(FoDApiHelper.getApiUri(`/api/v3/applications/${appId}/scans?${q}`))
+                            .headers({
+                                'authorization': `Bearer ${token}`,
+                                'content-type': 'application/octet-stream'
+                            })
+                            .get()((err: any, res: any, body: any) => {
+                                if (err)
+                                    return reject(err);
 
-                                const parsedBody = JSON.parse(body);
+                                switch (res.statusCode) {
+                                    case 200:
 
-                                if (parsedBody && parsedBody.totalCount) {
-                                    const items = parsedBody.items.map((item: any) => {
-                                        return `${item.scanType} Scan  --  Completed On: ${item.completedDateTime} -- ${item.totalIssues} Issues \
-                                                \n${FoDApiHelper.getSiteUri()}/redirect/releases/${item.releaseId}`;
-                                    });
+                                        const parsedBody = JSON.parse(body);
 
-                                    return msg.reply(`Three most recent scans for App Id ${appId}: \n${items.join('\n')}`);
+                                        if (parsedBody && parsedBody.totalCount) {
+                                            const items = parsedBody.items.map((item: any) => {
+                                                return `${item.scanType} Scan  --  Completed On: ${item.completedDateTime} -- ${item.totalIssues} Issues \
+                                                        \n${FoDApiHelper.getSiteUri()}/redirect/releases/${item.releaseId}`;
+                                            });
+
+                                            return resolve(`Three most recent scans for App Id ${appId}: \n${items.join('\n')}`);
+                                        }
+
+                                        return resolve(`Sorry, I couldn't find anything.`);
+
+                                    case 404:
+                                        return resolve(`Sorry, I couldn't find anything.`);
                                 }
-
-                                return msg.reply(`Sorry, I couldn't find anything.`);
-
-                            case 404:
-                                return msg.reply(`Sorry, I couldn't find anything.`);
-                        }
+                            });
                     });
-            });
+
+                })
+                .then((text) => {
+                    msg.reply(text);
+                })
+                .catch((err) => {
+                    robot.logger.error(err);
+                });
         }
     });
 
@@ -193,67 +238,143 @@ module.exports = (robot: any) => {
         const appId = parseInt(msg.match[3]);
         if (appId) {
 
-            authenticate(msg, (err, token) => {
-                if (err)
-                    return robot.logger.error(err);
+            authenticate(msg)
+                .then((token) => {
 
-                const q = qs.stringify({
-                    reportStatusTypeId: 2,
-                    applicationId: appId,
-                    fields: 'none'
-                });
+                    return new Promise<number>((resolve, reject) => {
+                        const q = qs.stringify({
+                            reportStatusTypeId: 2,
+                            applicationId: appId,
+                            fields: 'none'
+                        });
 
-                msg.http(FoDApiHelper.getApiUri(`/api/v3/reports?${q}`))
-                    .headers({
-                        'authorization': `Bearer ${token}`,
-                        'content-type': 'application/octet-stream'
-                    })
-                    .get()((err: any, res: any, body: any) => {
-                        if (err)
-                            return robot.logger.error(err);
+                        msg.http(FoDApiHelper.getApiUri(`/api/v3/reports?${q}`))
+                            .headers({
+                                'authorization': `Bearer ${token}`,
+                                'content-type': 'application/octet-stream'
+                            })
+                            .get()((err: any, res: any, body: any) => {
+                                if (err)
+                                    return reject(err);
 
-                        switch (res.statusCode) {
-                            case 200:
+                                switch (res.statusCode) {
+                                    case 200:
 
-                                const countResult: number = JSON.parse(body).totalCount || 0;
+                                        const countResult: number = JSON.parse(body).totalCount || 0;
 
-                                if (countResult > 0) {
-
-                                    const limit = 3;
-                                    const q = qs.stringify({
-                                        reportStatusTypeId: 2,
-                                        applicationId: appId,
-                                        offset: countResult - limit,
-                                        limit: limit,
-                                        orderBy: 'reportId',
-                                    });
-
-                                    msg.http(FoDApiHelper.getApiUri(`/api/v3/reports?${q}`))
-                                        .headers({
-                                            'authorization': `Bearer ${token}`,
-                                            'content-type': 'application/octet-stream'
-                                        })
-                                        .get()((err: any, res: any, body: any) => {
-                                            if (err)
-                                                return robot.logger.error(err);
-
-                                            let result = JSON.parse(body);
-
-                                            if (result && result.items) {
-                                                let items = result.items.map((item: any) => {
-                                                    return `${item.reportName} -- ${item.reportType}\
-                                                            \n${FoDApiHelper.getSiteUri(`/reports/downloadreport?reportId=${item.reportId}`)}`;
-                                                }).reverse();
-
-                                                return msg.reply(items.join('\n'));
-                                            }
-
-                                            return msg.reply(`Sorry, I couldn't find anything.`);
-                                        });
+                                        if (countResult > 0)
+                                            return resolve(countResult);
                                 }
-                        }
+                            });
+                    }).then((count: number) => {
+
+                        return new Promise<string>((resolve, reject) => {
+                            const limit = 3;
+                            const q = qs.stringify({
+                                reportStatusTypeId: 2,
+                                applicationId: appId,
+                                offset: Math.max(count - limit, 0),
+                                limit: limit,
+                                orderBy: 'reportId',
+                            });
+
+                            msg.http(FoDApiHelper.getApiUri(`/api/v3/reports?${q}`))
+                                .headers({
+                                    'authorization': `Bearer ${token}`,
+                                    'content-type': 'application/octet-stream'
+                                })
+                                .get()((err: any, res: any, body: any) => {
+                                    if (err)
+                                        return reject(err);
+
+                                    const result = JSON.parse(body);
+
+                                    if (result && result.items) {
+                                        const items = result.items.map((item: any) => {
+                                            return `${item.reportName} -- ${item.reportType}\
+                                                    \n${FoDApiHelper.getSiteUri(`/reports/downloadreport?reportId=${item.reportId}`)}`;
+                                        }).reverse();
+
+                                        return resolve(items.join('\n'));
+                                    }
+
+                                    return resolve(`Sorry, I couldn't find anything.`);
+                                });
+                        });
+
                     });
-            });
+                })
+                .then((text) => {
+                    msg.reply(text);
+                })
+                .catch((err) => {
+                    robot.logger.error(err);
+                });
+        }
+    });
+
+    robot.respond(/(show details|tell me about|details|about|issues) release (.\d+)/i, (msg: any) => {
+
+        const releaseId = parseInt(msg.match[2]);
+        if (releaseId) {
+            authenticate(msg)
+                .then((token) => {
+
+                    const promises: Array<Promise.IThenable<ISeverityCountResult>> = [];
+
+                    // hard coded values for the severityIds that come back
+                    [1, 2, 3, 4].forEach((severity) => {
+                        const q = qs.stringify({
+                            fields: 'severityString',
+                            limit: 1,
+                            filters: `severity:${severity}+isSuppressed:false`,
+                            excludeFilters: true
+                        });
+
+                        promises.push(
+                            new Promise<ISeverityCountResult>((resolve, reject) => {
+                                msg.http(FoDApiHelper.getApiUri(`/api/v3/releases/${releaseId}/vulnerabilities?${q}`))
+                                    .headers({
+                                        'authorization': `Bearer ${token}`,
+                                        'content-type': 'application/octet-stream'
+                                    })
+                                    .get()((err: any, res: any, body: any) => {
+                                        if (err)
+                                            return reject(err);
+
+                                        const result = JSON.parse(body);
+
+                                        if (result && result.totalCount && result.items) {
+                                            return resolve({ severityId: severity, severityType: result.items[0].severityString, count: result.totalCount });
+                                        }
+
+                                        return resolve(null);
+                                    });
+                            }));
+                    });
+
+                    return Promise.all(promises);
+                })
+                .then((result: Array<ISeverityCountResult>) => {
+
+                    if (result && result.length) {
+                        const severityResults = result
+                            .filter(item => { return item !== null; })
+                            .sort((a, b) => { return b.severityId - a.severityId; })
+                            .map(item => {
+                                return `${item.severityType}: ${item.count}`;
+                            })
+                            .join('\n');
+
+                        return msg.reply(`\nHere is the latest issue breakdown for Release ${releaseId}: \
+                                          \n${severityResults}`);
+                    }
+
+                    return msg.reply(`There aren't any issues for Release ${releaseId}`);
+                })
+                .catch((err) => {
+                    robot.logger.error(err);
+                });
         }
     });
     robot.respond(/(show |list |get |link )?(the )?issue (\d+)/i, (msg: any) => {
