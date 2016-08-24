@@ -14,6 +14,9 @@
 //    hubot show issue <id> - Links directly to the given Issue for <id>
 //    hubot issues release <id> - Gives the Issue Count breakdown for Release <id>
 //
+// Author:
+//    mtgibbs
+//
 
 /// <reference path="../typings/index.d.ts" />
 
