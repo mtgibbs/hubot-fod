@@ -322,7 +322,6 @@ module.exports = (robot: any) => {
 
                     const promises: Array<Promise.IThenable<ISeverityCountResult>> = [];
 
-                    // hard coded values for the severityIds that come back
                     [SeverityType.Low, SeverityType.Medium, SeverityType.High, SeverityType.Critical].forEach((severity) => {
                         const q = qs.stringify({
                             fields: 'severityString',
