@@ -263,14 +263,14 @@ module.exports = (robot: any) => {
                 if (err)
                     return robot.logger.error(err);
 
-                msg.http(FoDApiHelper.getApiUri(`/api.v3/vulnerabilities/${issueId}`))
+                msg.http(FoDApiHelper.getApiUri(`/api/v3/vulnerabilities/${issueId}`))
                     .headers({
                         'authorization': `Bearer ${token}`,
                         'content-type': 'application/octet-stream'
                     })
                     .get()((err: any, res: any, body: any) => {
                         if (err)
-                            return msg.reply(`Sorry, I couldn't find anything.`);
+                            return robot.logger.error(err);
 
                         switch (res.statusCode) {
                             case 200:
