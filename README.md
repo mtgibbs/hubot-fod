@@ -18,6 +18,21 @@ Add **hubot-fod** to your external-scripts.json
 ["hubot-fod"]
 ```
 
+## Commands
+
+Here is a list of available commands shown in the hubot help menu.  
+
+| Command                                                                    | Description                                       |
+| -------------------------------------------------------------------------- | ------------------------------------------------- |
+| hubot **list apps** *(page \<n>)?*                                         | Lists applications                                |
+| hubot **list** *(passing\|failing)?* **releases app \<id>** *(page \<n>)?* | Lists the releases for App \<id>                  |
+| hubot **list reports app \<id>**                                           | Lists the last 3 completed reports for App \<id>  |
+| hubot **list scans app \<id>**                                             | Lists the 3 most recent scans for App \<id>       |
+| hubot **show issue \<id>**                                                 | Links directly to the given Issue for \<id>       |
+| hubot **issues release \<id>**                                             | Gives the Issue Count breakdown for Release \<id> |
+
+Additional verbiage is supported in some cases.  If you are interested, you can take a look at the regex for matching the command in the script.
+
 ## Environment Variables
 
 Hubot requires a Fortify on Demand API Key and Secret to connect.
