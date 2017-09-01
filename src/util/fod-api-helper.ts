@@ -1,5 +1,3 @@
-/// <reference path="../../typings/index.d.ts" />
-
 export class FoDApiHelper {
 
     private static _DEFAULT_URI: string = 'ams.fortify.com';

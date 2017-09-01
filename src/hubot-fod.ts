@@ -18,8 +18,6 @@
 //    mtgibbs
 //
 
-/// <reference path="../typings/index.d.ts" />
-
 import {FoDApiHelper, ISeverityCountResult, SeverityType} from './util/fod-api-helper';
 import * as qs from 'querystring';
 import * as Promise from 'promise';
