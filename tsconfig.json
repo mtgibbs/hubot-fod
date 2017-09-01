@@ -7,11 +7,13 @@
         "preserveConstEnums": true,
         "sourceMap": false,
         "outDir": "dist",
-        "declaration": false
+        "declaration": false,
+        "typeRoots": [
+            "./node_modules/@types"
+        ]
     },
-    "files": [
+    "include": [
         "index.ts",
-        "./src/util/fod-api-helper.ts",
-        "./src/hubot-fod.ts"
+        "./src/**/*.ts"
     ]
 }
