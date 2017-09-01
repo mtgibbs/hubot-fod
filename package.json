@@ -1,6 +1,6 @@
 {
   "name": "hubot-fod",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Hubot Script for communicating with Fortify on Demand.",
   "main": "./dist/index.js",
   "scripts": {
