@@ -10,6 +10,7 @@
     "start": "tsc && concurrently \"npm run tsc:w\"",
     "clean": "rimraf dist",
     "lint": "tslint -c ./tslint.json ./**/*.ts --exclude \"./node_modules/**/*\"",
+    "build": "npm run clean && npm run lint && npm run tsc"
   },
   "author": "Matt Gibbs <matt@mtgibbs.xyz> (http://mtgibbs.xyz)",
   "contributors": [
