@@ -2,7 +2,7 @@
 
 export class FoDApiHelper {
 
-    private static _DEFAULT_URI: string = 'hpfod.com';
+    private static _DEFAULT_URI: string = 'ams.fortify.com';
     private static _DEFAULT_PROTOCOL: string = 'https';
 
     public static getApiUri(path?: string): string {

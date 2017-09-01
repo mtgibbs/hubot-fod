@@ -30,7 +30,7 @@ const authenticate = (msg: any): Promise.IThenable<string> => {
 
         const body = qs.stringify({
             grant_type: 'client_credentials',
-            scope: 'https://hpfod.com/tenant',
+            scope: 'api-tenant',
             client_id: process.env.HUBOT_FOD_APIKEY,
             client_secret: process.env.HUBOT_FOD_APISECRET
         });
